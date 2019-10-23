@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--名称空间-->
+<mapper namespace="com.itheima.gossip.mapper.NewsMapper">
+    <!--通过最大值查询数据-->
+    <select id="queryNewsListByMaxId" parameterType="string" resultType="news">
+        SELECT * FROM news WHERE id > #{maxid} limit 0,100
+    </select>
+
+    <!--通过之前保存的最大值 查询现在的最大值-->
+    <select id="queryMaxIdByMaxId" parameterType="string" resultType="string">
+        SELECT MAX(id) FROM (SELECT * FROM news WHERE id > #{maxid} limit 0,100) temp
+    </select>
+
+
+</mapper>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                           http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+    <!-- 配置数据源 -->
+    <bean id = "dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://192.168.70.13:3306/gossip?characterEncoding=utf-8"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+    </bean>
+    <!-- 配置sqlsessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:sqlMapConfig.xml"></property>
+        <property name="dataSource" ref="dataSource"></property>
+        <!--用于加载mapper文件-->
+        <property name="mapperLocations" value="classpath:mapper/*"></property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.itheima.gossip.mapper"></property>
+    </bean>
+
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="30"/><!--最大连接数 -->
+        <property name="maxIdle" value="10"/><!--最大空闲连接数 -->
+        <property name="maxWaitMillis" value="1500"/><!--获取连接时最大等待毫秒数-->
+        <property name="testOnBorrow" value="true"/><!--在获取连接时检查连接有效性-->
+    </bean>
+    <bean id = "jedisPool" class="redis.clients.jedis.JedisPool" scope="singleton">
+        <constructor-arg index="0" ref="jedisPoolConfig"/>
+        <constructor-arg index="1" value="bigdata02" type="java.lang.String"/>
+        <constructor-arg index="2" value="6379" type="int"/>
+    </bean>
+
+    <!-- 引用dubbo 服务 -->
+    <dubbo:application name="gossip_searchPortal"/>
+    <dubbo:registry protocol="zookeeper" address="bigdata01:2181,bigdata02:2181,bigdata03:2181"/>
+    <dubbo:annotation package="com.itheima.gossip.service"/>
+</beans>
