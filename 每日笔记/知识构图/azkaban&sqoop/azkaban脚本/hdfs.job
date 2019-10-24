@@ -1,0 +1,2 @@
+type=command
+command=/export/servers/hadoop-2.6.0-cdh5.14.0/bin/hadoop fs -mkdir -p /azkaban

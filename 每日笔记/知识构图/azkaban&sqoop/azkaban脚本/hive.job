@@ -1,0 +1,2 @@
+type=command
+command=/export/servers/hive-1.1.0-cdh5.14.0/bin/hive -f 'hive.sql'
